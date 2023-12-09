@@ -1,0 +1,6 @@
+*.idea
+*x64
+*.user
+*.filters
+*.vcxproj
+*.vs

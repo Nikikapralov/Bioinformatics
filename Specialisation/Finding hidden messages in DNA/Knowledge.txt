@@ -1,0 +1,53 @@
+Chapter 1 - DNA Replication.
+- Begins in the Origin of Replication - OriC
+
+Why is it important to know the OriC? - When we do genetic manipulations, we need to ensure that the OriC remains intact
+so that the cell can continue to replicate without a problem.
+
+How do we find the OriC purely computationally? - This is rather hard. If we were doing it the biologist way, we would cut off
+parts of the genome and then check if the cells replicate. If they did not, we possibly removed the OriC. As a computer scientist,
+this is a little bit harder to achieve. We know that protein named DnaA initiates the replication when it binds to one or multiple
+boxes of DNA called DnaA boxes. Why multiple? Well if a mutation occurs, then having other undamaged copies will ensure that 
+replication can continue. They hold the same DNA transcripts. The question is, can we find something in the genome that stands
+out?
+
+PROBLEM: Here we have our first problem, counting K-mers. We try to find how many times a string is found in a block of text.
+Be careful, the strings may overlap! As such we need to use a sliding window technique.
+
+PROBLEM: The second problem appears almost immediately. Sure, we found the frequency of a specific K-mer, but what if we don't know
+what to look for? Could we possibly search for the frequency of all K-mers? Sure we can. We can do this by looping through the text
+once and saving each value in a dictionary/map. At the end simply filter for the ones with the highest count.
+
+DnaA boxes are usually 9 nucleotides long. This has been declared experimentally. When using our program, we can find that some
+long k-mers appear relatively frequently, despite that being statistically unlikely. As such, that means that they must hold some
+genetic value and are worth preserving - DnaA box. It turns out that there are multiple K-mers but they are somewhat similar...
+some are reverse compliments of others! 
+
+DNA strands and their compliments are always read in 5 -> 3 direction ;).
+
+PROBLEM: Some strands have reverse complements. The DnaA protein does not care if it binds to the DnaA box or its reverse complement
+(also considered a DnaA box). Those happen due to the replication of the DNA and the existence of 2 strands, going
+in separate directions. Thus we need to find the most common occurrences of a k-mer in a string and then find the reverse complement.
+
+PROBLEM: From here we may deduce that we have found the OriC and that those dna k-mers are the DnaA boxes. That may be so, but what 
+if those statistically unreasonable k-mers appear rather frequently throughout the whole genome? Afterall, DnaA boxes should be found
+only at the OriC site. We have to check the whole genome and check where those k-mers occur. If we are correct, we will see a clump
+of such k-mers at our OriC region and an absence everywhere else.
+
+Checking the Vibrio Cholerae genome returns the following locations: 60039 98409 129189 152283 152354 152411 163207 197028 200160
+ 357976 376771 392723 532935 600085 622755 1065555
+
+We can deduce that most likely, the bacteria has 3 or 2 OriC points. Between 150 000 - 163 000, 35 000 - 393 000 and the last one
+around the 600 000 - 623 000. After doing the same with the reverse compliment, we find it at around 150 000 - 152 000. As such,
+we can be fairly certain that this is an OriC and it's DnaA box. Is it the same for all bacterial genomes? Of course not. They
+have different Dna A boxes, we confirm that after doing the same experiment with different genomes.
+
+PROBLEM: We have a new genome and we need to find the OriC and the DnaA boxes. We know that we need to find some k-mers that clump 
+together in a space. We do not know how long they are, but we can try to guess, maybe around 9 bases. So let us try to find all 
+k-mers that clump together in a specific range. The OriC is usually around 500 bases big, so we will choose to search for a clump of
+k-mers every 500 bases of our DNA strand.
+
+Chapter 2: - DNA Replication 
+
+
+
