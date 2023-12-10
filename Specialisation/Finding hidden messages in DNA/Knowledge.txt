@@ -47,7 +47,149 @@ together in a space. We do not know how long they are, but we can try to guess, 
 k-mers that clump together in a specific range. The OriC is usually around 500 bases big, so we will choose to search for a clump of
 k-mers every 500 bases of our DNA strand.
 
-Chapter 2: - DNA Replication 
+Chapter 2: - DNA Replication in more detail.
+
+4 - DNA Polymerases replicate the chromosome. 2 for each strand, 1 in each direction.
+To start, they need a primer. They then copy the chromosome until they reach the terminus point.
+
+What this means is that the circular bacterial chromosome is replicated in 2 directions.
+Two helicases open the chromosome and one goes right, the other goes left. Then 4 DNA Polymerases
+start working, 2 in each direction. That ultimately results in 2 new chromosomes, each of which has its 
+one half created by okazaki fragments, the other - by the leading strand.
+
+DNA Polymerase is UNIDIRECTIONAL, it can only copy DNA in one direction, namely - 3 -> 5 instead of the
+5 -> 3 direction known up to this point.
+
+Forward half strands - 5 -> 3 direction. (Okazaki Fragments) - Lagging strand.
+Reverse half strands - 3 -> 5 direction. (Normal replication.) - Leading strand.
+
+(This is why we need forward and reverse primers to perform PCR.)
+
+Okazaki fragments need to wait for the fork to open, then they need to stick a primer and build
+backwards. That happens multiple times. DNA Ligase sews the gaps between the Okazaki Fragments, not
+at the very end, but during the process.
+
+Helicase starts the DNA unwinding.
+Due to the unwinding, torsional stress occurs.
+DNA Topoisomerase 1 and 2 relieve the torsional stress but cutting the stressed parts.
+Primase adds an RNA primer to the opened DNA strand.
+DNA Polymerase binds to the primer and adds the bases.
+DNA Ligase fuses the Okazaki Fragments from time to time.
+
+Semiconservative - one old strand and one new strand!
+
+Now something interesting!
+Starting from Terminus and going to direction of OriC (reverse way) - high Cytosine count in fragments!
+Above 25%. But low Guanine frequency! Below 25%! Lagging strand.
+
+Starting from OriC and going to direction of Terminus (forward way) - low Cytosine count in fragments!
+Below 25%. But high Guanine frequency! Above 25%! Leading strand.
+
+So lagging strand has high Cytosine and low Guanine,
+while leading strand has high Guanine and low Cytosine!
+
+This is called the skew problem and is believed to be caused by the higher mutation rate of the lagging
+strand. (Which is also disputed, since some experiments determine a lower mutation count on the lagging
+strand!)
+
+Basically lagging strand has a higher Cytosine and Adenine count, whereas the leading strand has a higher
+Guanin and Thymine count!
+
+We can use this to "walk" along the DNA strand and check when the Cytosine content drops and the Guanine 
+content rises. At this point, we can conclude that we have found the OriC! Alternatively, we can find the 
+Terminus by checking when the Guanine content drops and the Cytosine begins to rise!
+
+Why does that happen? Deamination!
+A DNA Helix is stable, because it is composed of 2 strands that hold each other through the H-bounds.
+An unwinded DNA Helix is in comparison, highly unstable and prone to mutations! What this means is that
+the longer a DNA strand remains unwinded, the more it could mutate. Well, which DNA strand remains unwinded
+for a longer time, the leading or the lagging? The lagging, of course. Since it has to wait for the Okazaki
+fragments to be built. This results in Cytosine mutating to Thymine through Deamination. That then results
+in a lower Guanine rate on the opposite strand as well since a GC pair will mutate to a TA pair.
+
+Difference between total amount of guanine and cytosine on leading strand is negative. On lagging strand -
+its positive.
+
+(Lagging has less C, leading has more C)
+
+PROBLEM: Starting at a random spot in the genome and walking along the base pairs, we can compute the 
+skew. We will see that at a certain point, the skew rises and at a different, it falls. The skew maximum
+is attained at the highest point where G content is at its maximum and then C content begins to increase.
+That is the Terminus. The skew minimum is where the C content is at its maximum and the G content begins 
+to increase. That is...the OriC! Find the minimum skew, the OriC!
+
+Good, we successfully found the OriC! Now let us check for 9-mers to locate the DnaA boxes! Aaand...
+there are no 9-mers. Ok, what now? Let's go back to the E.coli genome where we searched for DnaA boxes.
+We can see some 9-mers and what is that? Another 9-mer that is equal to the rest apart for 1 letter? This
+is statistically improbable. Maybe it was a complete 9-mer but mutated? This does not bother us, since we
+know that DnaA protein can bind to an incomplete DnaA box. So it actually makes sense.
+
+Those incomplete DnaA boxes, can also be seen as mismatches to a complete DnaA box. How much a complete
+to an incomplete box differs, that is called the Hamming distance.
+
+PROBLEM: Hamming Distance - find how much 2 strings differ from each other.
+
+PROBLEM: Approximate Pattern Matching - We can search for a K-mer in a string and allow for a certain
+amount of errors. For example, we may search for 9 - mer but say that up to 3 bases that mismatch are still
+acceptable and the k-mer is to be counted even if not an exact match. This is so, since DnaA can bind even
+to an incomplete DnaA box. That means that even an incomplete but fairly similar 9-mer should not be discarded.
+
+Good, we are able to find the positions and count of all k-mers that have a tolerable rate of Hamming Distance
+error. But what if we want to find the most freuent k-mers with that Hamming Distance?
+
+PROBLEM: Most Freuqent K-mer With Mismatch - Find the most freuquent k-mers in the DNA with an 
+acceptable Hamming Distance. We do that the naive way, by going through the text and adding each k-mer
+to a map. Then checking each k-mer in the map against each other and find which have a tolerable hamming 
+distance. This is quite inefficient though. Not only that, it will not give us any potential mutated k-mers
+that may be encountered! To correctly solve this question, we need to generate the neighbours of a k-mer
+and then check the hamming distance against each neighbour.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
