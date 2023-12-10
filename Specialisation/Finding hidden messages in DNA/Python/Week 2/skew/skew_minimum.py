@@ -1,16 +1,6 @@
-import os
+
 import sys
 
-from utils.utils import get_data
-path = os.path.join(os.curdir, "dataset.txt")
-data = get_data(path)
-
-bases_skew_dictionary = {
-    "A": 0,
-    "T": 0,
-    "G": 1,
-    "C": -1,
-}
 
 """
 Find the position in the skew diagram where it attains a minimum. So first we need to generate the skew diagram
@@ -21,33 +11,18 @@ loop, but I will not implement it here since it is trivial.
 """
 
 
-def get_skew_diagram(data):
-    current_skew = 0
-    skew_results = [(current_skew, 0)]
-    for index, base in enumerate(data):
-        if base == "\n":
-            continue
-        current_skew += bases_skew_dictionary[base]
-        skew_results.append((current_skew, index + 1))
-    return skew_results
-
-
 def get_minimum_skew_from_diagram(skew_results):
     current_minimum_skew_list = []
     current_minimum = sys.maxsize
 
-    for skew, index in skew_results:
+    for index, skew in enumerate(skew_results):
         if skew < current_minimum:
             current_minimum = skew
-            current_minimum_skew_list = [str(index)]
+            current_minimum_skew_list = [(str(index), str(skew))]
 
         elif skew == current_minimum:
-            current_minimum_skew_list.append(str(index))
+            current_minimum_skew_list.append((str(index), str(skew)))
 
     return current_minimum_skew_list
 
-
-
-skew_list = get_skew_diagram(data)
-skew_minimum_list = get_minimum_skew_from_diagram(skew_list)
-print(" ".join(skew_minimum_list))
+print(get_minimum_skew_from_diagram([int(x) for x in ['0', '0', '0', '0', '-1', '-1', '-2', '-2', '-2', '-3', '-4', '-5', '-4', '-4', '-3', '-3', '-3', '-2', '-1', '-1', '-1', '-2', '-2', '-1']]))

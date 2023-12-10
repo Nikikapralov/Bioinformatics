@@ -1,8 +1,9 @@
 from hamming_distance import get_hamming_distance
+from dna_neighbourhood import neighbourhood_with_mismatch
 
-data = "AAAGCTGAA"
-k_mer_length = 3
-mismatch = 1
+data = "TTGTGAGTTGTCATTGGGAGTCGTCGCATTGGCATTTGTTGGCATTTGTGAGTTGTTTGTTCGGAGTTGTCATGAGGAGTGGGAGTCGTGGCATCATTCGTGGTCGTGGTGGTCGTGGGAGCATTGGGAGTCGTTGTTCGTGGTGGTCGTGGTGGTGGGAGGAGGAGTTGTTCGCATCATGAGGAGCATTTGTTTGTTCGGAGTCGTCGTGGGAGCATTTGTTGGTGGTGGTCGCATGAGCATGAGGAGGAGTGGTTGTCATTCGTGGTGGCATCATCATTTGTTGGTCGCATGAGTCGTGGTTGTTCGTCGTGGGAGTGGGAGGAGTCG"
+k_mer_length = 6
+mismatch = 3
 
 """
 This algorithm finds the most frequent k_mer with a mismatch that already exists in a DNA strand.
@@ -54,6 +55,32 @@ def most_frequent_k_mer_with_mismatch_no_mutations(data, k_mer_length, mismatch)
 # result = inefficient_most_frequent_k_mer_with_mismatch(data, k_mer_length, mismatch)
 # print(" ".join(result))
 
+"""
+This algorithm takes into account all possible mutations as well.
+"""
 def most_frequent_k_mers_with_mismatch_mutations_too(data, k_mer_length, mismatch):
-    pass
+    frequency_map = {}
+    data_length = len(data)
+    for i in range(data_length - k_mer_length):
+        pattern = data[i:i + k_mer_length]
+        neighbourhood = neighbourhood_with_mismatch(pattern, mismatch)
+        for neighbour in neighbourhood:
+            if neighbour not in frequency_map:
+                frequency_map[neighbour] = 1
+            else:
+                frequency_map[neighbour] += 1
+
+    sorted_k_mers = sorted(frequency_map.items(), key=lambda x: x[1], reverse=True)
+    most_frequent_k_mers_with_mismatch = []
+    try:
+        highest_number_count = sorted_k_mers[0][1]
+    except IndexError:
+        return most_frequent_k_mers_with_mismatch
+
+    for k_mer, count in sorted_k_mers:
+        if count == highest_number_count:
+            most_frequent_k_mers_with_mismatch.append(k_mer)
+        else:
+            break
+    return most_frequent_k_mers_with_mismatch
 

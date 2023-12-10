@@ -47,6 +47,10 @@ together in a space. We do not know how long they are, but we can try to guess, 
 k-mers that clump together in a specific range. The OriC is usually around 500 bases big, so we will choose to search for a clump of
 k-mers every 500 bases of our DNA strand.
 
+
+
+
+
 Chapter 2: - DNA Replication in more detail.
 
 4 - DNA Polymerases replicate the chromosome. 2 for each strand, 1 in each direction.
@@ -144,20 +148,153 @@ distance. This is quite inefficient though. Not only that, it will not give us a
 that may be encountered! To correctly solve this question, we need to generate the neighbours of a k-mer
 and then check the hamming distance against each neighbour.
 
+What is the importance of a Reverse Complementary strand in Biology? Well, take for example the circular
+bacterial chromosome. Now, since DNA is semiconservative, we know that one strand will always be used as 
+a template. The 2 strands are not equal, but reverse complementray. (A - T) etc. So if we take and analyze
+just one strand, we may miss some interesting insights. For that purpose, we need to analyze both the strand
+we are given and its reverse complementary strand. Alternatively, we may want to just look for instances
+of the reverse complement of the pattern and where it may appear. Since having a repeated 9-mer is rare, but
+having a repeated reverse complement of the same k-mer? Ultra rare.
+
+PROBLEM: Most Frequent K-mer with Mismatch and the reverse complement of said K-mer with mismatch.
+
+How would you find DnaA boxes in new bacteria, now that you have this knowledge?
+
+I would first search for the position where the skew attains a minimum.
+This will direct me to the position of the OriC. I will then confirm through biological methods
+that the region is indeed the OriC. (Removing the DNA region and checking for bacterial reprocution).
+After being sure that the region I am in is the OriC, I will search for frequent k-mers
+and their reverse complementary strings with a length of 8 to 10 and hamming distance of 3.
+I will then compare the results for 8-mers, 9-mers and 10-mers with each other and then the 9-mers
+with the 9-mers of different bacteria. Hopefully this will be enough to
+notice plenty of similarties in the 9-mers and conclude of the existence of a potential Dna A box.
+
+
+Now we try to find a DNA A box in Salmonella Enterica!
+
+Why does DNA Polymerase work just in 1 direction? - https://www.youtube.com/watch?v=y4hKibS2fAo
+But basically, if you add a new nucleotide, in the correct direction, the phosphate groups are near to the
+sugar part and they fuse without need of much energy. If you go the other way around, the first time you
+are adding a base, the sugar part will face a phosphate group which has already lost its other 2 phosphates.
+That means that the energy needed for the reaction to occur will be very very high. Once the first base
+is there though, you could proceed normally. Due to the first step, the DNA Polymerase works in only one
+direction!
 
 
 
 
 
 
+Chapter 3: - Hunting for Regulatory Motifs
+
+- Regulatory Motifs are pieces of DNA that regulate the expression of certain genes.
+
+Let us take a look at the regulatory systems in plants since they are very, very important.
+3 Genes call all the shots - CCA1, LCY and TOC1
+
+TOC1 promotes expression of CCA1 and LCY, while the other 2 repress expression of TOC1.
+This results in a negative feedback loop, where more TOC1 means more CCA1 and LCY which means
+less TOC1. Light increases production of CCA1 and LCY which repress TOC1. When there is no light,
+TOC1 can be expressed which in turn will lead to possibility for expression of CCA1 and LCY when there
+is sunlight afterwards.
+
+DSPS - Delayed sleep phase syndrom - malfunction of the circadian rythm due to a genetic modification.
+
+Transcription factors - proteins that regulate the expression of genes.
+They bind to a short piece of DNA (regulatory motif) a little stretch before the start of the 
+gene in the DNA. - called upstream site.
+
+Regulatory motifs are highly conserved between species, unfortunately some mutations do occur which do not
+stop the transcription factors from binding.
+
+How do we find those motifs without knowing what they look like?
+Can we use the algorithm for finding DnaA boxes? 
+
+Sure we could, we could take 10 genomes and apply the frequent words problem to a concatenated version
+of this genome. This will return the most common string among all 10. But what if this most common string is
+actually allowed to mutate a little between all of these genomes? Suddenly, we have 10 different versions 
+and not 1 most common string. Maybe we can use the frequent words with mismatches? Sure, but the data 
+suddenly becomes huge and unfeasible to compute. Not only that, the frequent words with mismatches solution
+caters to an entirely different problem. When we were searching for DNA A boxes, what was the assumption?
+We are saerching for clumps of boxes within a small region DNA. Here, that is no longer the case. We are
+now searching for one occurence of a specific motif within multiple DNA strands, that is highly conserved.
+
+PROBLEM: Motif finding - Brute Force - Find a K-mer that appears in each DNA string with at most d mismatches.
+
+Good, we managed to solve the motif finding problem successfully by brute forcing it. Unfortunately, 
+this simply wouldn't work with real genomes and will be highly impractical. Sure, this algorithm would 
+translate well in a multicore environment and maybe even be portable to GPUs, but creating a more efficient
+algorithm is the correct way to go. 
+
+We could try to identify the 2 most similar K-mers between each pair of strings in the DNA?
+Sure, what about these:
+AgAAgAAAGGttGGG
+|| || | || |  
+cAAtAAAAcGGGGcG
+
+Fairly similar, yet each has mutated 4 times. Unfortunately for us, the mutations are different and in total,
+despite the 2 strings having the same origin, they are at a hamming distance of 8 instead of 4! Worst case
+scenario! What do we do?
+
+We implement scoring matrices and concensus strings!
+
+What is the problem with the brute force approach? It expects that all 10 DNA strands have a copy of the 
+regulatory motif, otherwise the neighbour isn't counted at all. Unfortunately for us, not all copies of 
+genes will have the binding site for the regulatory motif. That doesn't mean that it doesn't exist, it 
+simply means that we had a bad draw of the dna strands. It may be present in some and in some not!
+Could we not add some hamming distance for genes as well? If it doesn't appear in 10% of genes but does in
+90%, then all good, right? Well, maybe. But we could also just create a scoring function. That function
+would score individual instances of a motif to how close it resembles an "ideal" version. We don't know
+this "ideal" string though...So we take a k-mer from each string and we score the k-mers according to how
+similar they are to each other.
+
+We take a k-mer from each strand and we put them in a matrix.
+Then we check the columns and we find the most frequent nucleotide (ATGC) for each column.
+If the occurences are the same, we arbitrarily choose one. Each small letter nucleotide adds 1 point.
+The goal is to select the most conserved motif matrix, that with the lowest score.
+accG
+atTG
+GtTG
+GATG
+GATG
+
+score of this matrix is 6
+
+Afterwards we create a profile matrix that looks like that:
+
+A 0.2
+C 0.1
+G 0
+T 0.7 
+
+It shows the percentage of ACGT at each col of the matrix. The cols add up to 1.
+
+Finally we form a concensus string from the most popular letters of each column in the matrix.
+This concensus matrix provides an ideal candidate of our regulatory profile. 
+
+We may have a column that has 6Cs and 4As, and another, with 6Cs 2As and 2Ts. Does it make sense
+to score them the same, since both of them have 6 Cs? Well, no, since the 6C, 4A column is more conserved.
+In reality, some regulatory motifs have a few spots that are highly conserved (just 1 nucleotide) and some
+that are weakly conserved (either A or T for example). This means that if we encounter a highly conserved 
+point, we should give full score, weakly conserved point should give lower score if either of the bases are
+in the conserved range (either A or T - for example) or lowest if it is a completely random mutation.
+
+For many biological motifs, certain positions feature two nucleotides with roughly the same ability to bind to a transcription factor.
+ For example, the sixteen nucleotide-long CSRE transcription factor binding site in the yeast species S. cerevisiae
+ consists of five strongly conserved positions (1, 8, 9, 12, and 13) in addition to eleven weakly conserved positions,
+ each of which features two nucleotides with similar frequencies (see figure below).
 
 
 
+Following this example, a more appropriate representation of the consensus string TCGGGGATTTCC for the NF-κB binding sites
+ should include viable alternatives to the most popular nucleotides in each column. For example, nucleotides with frequencies equal
+ to or exceeding 0.4. In this sense, the last column (6 C, 4 T) in the NF-κB motif matrix (reproduced below) is “more conserved”
+ than the 2nd column (6 C, 2 A, 2 T) and should receive a lower score.
 
+We can use entropy for our scoring function: H = p1 logs(1/p1) + p2 logs(1/p2) + ⋯ + pk logs(1/pk).
 
-
-
-
+The lower the entropy, the more conserved our DNA strings are.
+Note: Technically, log2(0) is undefined, but in the computation of entropy, we assume that 0 · log2(0) is equal to 0.
 
 
 

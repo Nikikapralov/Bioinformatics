@@ -7,5 +7,4 @@ We can find the amount of the frequent k_mers with a mismatch.
 """
 from approximate_pattern_k_mer import get_starting_positions_of_approximate_pattern_k_mer
 result = get_starting_positions_of_approximate_pattern_k_mer(data, k_mer_match, maximal_error_rate)
-print(result)
-print(len(result))
+print(len(get_starting_positions_of_approximate_pattern_k_mer("CATGCCATTCGCATTGTCCCAGTGA", "CCC", 2)))

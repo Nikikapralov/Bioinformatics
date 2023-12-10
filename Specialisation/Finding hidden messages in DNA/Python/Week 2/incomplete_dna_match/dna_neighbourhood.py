@@ -1,5 +1,8 @@
-from hamming_distance import get_hamming_distance
+from Week_2.incomplete_dna_match.hamming_distance import get_hamming_distance
 
+"""
+A neighbourhood is defined as all possible version of a k-mer with at most d mismatches.
+"""
 def neighbourhood(pattern):
     result = set()
     result.add(pattern)
@@ -12,25 +15,21 @@ def neighbourhood(pattern):
                 result.add("".join(to_add))
     return result
 
-print(neighbourhood("ACG"))
-
 def neighbourhood_with_mismatch(pattern, mismatch):
-    if mismatch == 0:
+    if mismatch == 0: # If possibility for mismatch is 0, return the same pattern. It cannot change.
         return {pattern}
-    if len(pattern) == 1:
+    if len(pattern) == 1: # If the pattern is just 1 character,
+        # then even if it could change, only the bases can be answer.
         return {"A", "T", "C", "G"}
     result = set()
-    suffix_pattern = pattern[1:]
-    suffix_neighbours = neighbourhood_with_mismatch(suffix_pattern, mismatch)
-    for text in suffix_neighbours:
+    suffix_pattern = pattern[1:] # Next pattern, until len(pattern) is 1;
+    suffix_neighbours = neighbourhood_with_mismatch(suffix_pattern, mismatch) # Recurse inside tree.
+
+    for text in suffix_neighbours: # Suffix neighbours will at first just be ATCG, then build from there.
         if get_hamming_distance(suffix_pattern, text) < mismatch:
             for nucleotide in {"A", "T", "C", "G"}:
-                result.add(nucleotide + text)
+                result.add(nucleotide + text) # From ATCG build AA AT AC AG and etc.
         else:
-            result.add(pattern[0] + text)
+            result.add(pattern[0] + text) # If distance is bigger than the allowed mismatch
+            # then add the current pattern + the suffix rebuilding the string as it is.
     return result
-result = neighbourhood_with_mismatch("AGCAGGGTC", 2)
-print(" ".join(result))
-
-
-

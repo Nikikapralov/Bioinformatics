@@ -9,3 +9,4 @@ def get_hamming_distance(data, match):
         if base != data[index]:
             hamming_distance += 1
     return hamming_distance
+
