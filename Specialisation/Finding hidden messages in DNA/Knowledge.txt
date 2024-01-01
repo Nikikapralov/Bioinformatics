@@ -361,6 +361,77 @@ incomplete match. So, basically find the concensus string and then check probabi
 PROBLEM: STRING WITH HIGHEST PROBABILITY ACCORDING TO PROFILE OF CONCENCUS STRING - find the k-mer in the dna string that has the highest probability to occur (is nearest) to the
 concensus string from which the profile was generated.
 
+PROBLEM: GreedyMotifSearch - greedy motif search works in the following way:
+For each string in Dna1.
+Create a probability matrix. For each Dna:
+Find the most accurate string and create matrix from it and previous strings.
+Repeat. - This is optimizing the probability matrix.
+
+At the end, use a scoring function to score the group of motifs. (We can use entropy or hamming distance).
+Return the group of motifs with lowest score.
+
+This is good but we have a problem. If a base has a probability of 0 in the string, this string gets
+discarded (since multiplying by 0 will return 0 aka lowest probability). This is a gross oversimplification
+of the problem since even though we may not have encountered the base, it does not mean that its probability
+is 0, it may just be very rare. As such we use pseudocounts. If a base is not found, it does not get 0
+probability but a very small one. Simply add 1 to the counts of the bases. 
+
+PROBLEM: GreedyMotifSearch with PSEUDOCOUNTS. - provides a more accurate solution.
+
+
+
+
+Chapter 4: How rolling dice can help us find regulatory motifs!
+
+We can use randomized algorithms to find implanted motifs in DNA. Sure it may sound as a bad idea, but 
+it actually isn't! Implanted motifs break the randomness of a DNA strand, meaning, the strings are never
+truly random. As such, using scoring functions and random sampling, we can obtain an approximation of the 
+implanted motif.
+
+Las Vegas algorithms - solutions are exact, despite the algorithm making random decisions.
+Monte Carlo algorithms - solutions are an approximation, despite the algorithm making random decisions.
+
+A Las Vegas algorithm always produces the correct result, but its running time is based on a random value.
+A Monte Carlo algorithm has a deterministic running time and produces an answer that has a probability
+of ≥ 1/3 of being correct.
+
+At a k-mer length of 15 and with a string length of 1000 plus we start competing with naturally occuring random motifs.
+This can be mitigated by lowering the string length to about 100 using ChipSeq.
+
+We can create a probability matrix from a set of DNA strings, but can we create the motifs from the 
+probability matrix? Sure, we can!
+
+PROBLEM: RandomizedMotifSearch
+
+The solution looks like that: 
+
+In general, we can begin from a collection of randomly chosen k-mers Motifs in Dna, construct Profile(Motifs), and use this profile to generate a new collection of k-mers:
+
+Motifs(Profile(Motifs), Dna).
+
+Why would we do this? Because our hope is that Motifs(Profile(Motifs), Dna) has a better score than the original collection of k-mers Motifs.
+We can then form the profile matrix of these k-mers,
+
+Profile(Motifs(Profile(Motifs), Dna))
+
+and use it to form the most probable k-mers,
+
+Motifs(Profile(Motifs(Profile(Motifs), Dna)), Dna).
+
+We can continue to iterate. . .
+
+...Profile(Motifs(Profile(Motifs(Profile(Motifs), Dna)), Dna))...
+
+At the end, we have to run this algorithm a 1000 times and get the motifs with the best score.
+
+Such an algorithm is emberassingly parallelizable, since we can run it x times * y cores = 1000 or even 10 000.
+
+This algorithm is unfortunately limited by its random nature, we can say that it is too random. It is totally dependent on whether we 
+are lucky enough to score a non random motif at the start of our program.
+In order to be more precise, we need to use Gibbs Sampling algorithm which does not choose new totally random motifs, but instead
+replaces one motif.
+
+
 
 
 

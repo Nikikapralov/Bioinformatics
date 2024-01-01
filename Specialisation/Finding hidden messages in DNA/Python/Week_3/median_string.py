@@ -3,21 +3,17 @@ This is a faster way to find the string by which the entropy of the matrix is th
 We concatenate all the strings, then we go k-mer by k-mer using the rolling window technique.
 Afterwards, for each k-mer, we go and find the score. The one with the lowest score is our k-mer.
 """
-import os
 import sys
 from Week_2.incomplete_dna_match.hamming_distance import get_hamming_distance
 
-from utils.utils import get_data
-
-path = os.path.join(os.curdir, "dataset.txt")
-data = get_data(path)
+data = "CTCGATGAGTAGGAAAGTAGTTTCACTGGGCGAACCACCCCGGCGCTAATCCTAGTGCCC GCAATCCTACCCGAGGCCACATATCAGTAGGAACTAGAACCACCACGGGTGGCTAGTTTC GGTGTTGAACCACGGGGTTAGTTTCATCTATTGTAGGAATCGGCTTCAAATCCTACACAG"
 data = data.split(" ")
-length_k = 6
+length_k = 7
 
 def median_string(dna_strings_matrix, k_mer_length):
     one_big_dna = "".join(dna_strings_matrix) # Instead of looping through permutations,
     # just loop through existing k-mers of all strings joined together.
-    maximum_index = len(one_big_dna) - k_mer_length
+    maximum_index = len(one_big_dna) - k_mer_length + 1
     k_mer_set = set()
     current_distance = sys.maxsize
     k_mer_with_lowest_score = None
@@ -35,17 +31,16 @@ def median_string(dna_strings_matrix, k_mer_length):
 def compute_distance(k_mer, dna_strings_matrix, k_mer_length):
     total_distance = 0
     for dna_string in dna_strings_matrix:
-        maximum_index = len(dna_string) - k_mer_length
+        maximum_index = len(dna_string) - k_mer_length + 1
         lowest_hamming_distance = sys.maxsize
-        for index in range(maximum_index):
+        for index in range(maximum_index): # Range is exclusive, so maximum index has to have a +1
             potential_match = dna_string[index:index + k_mer_length]
+            print(potential_match, index, index+k_mer_length, k_mer_length, len(dna_string))
             current_hamming_distance = get_hamming_distance(potential_match, k_mer)
             if current_hamming_distance < lowest_hamming_distance:
                 lowest_hamming_distance = current_hamming_distance
+
         total_distance += lowest_hamming_distance
     return total_distance
 
-
-
-print(median_string(data, length_k))
-
+print(median_string(dna_strings_matrix=data, k_mer_length=length_k))
